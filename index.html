@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Joc de Pescuit 3D</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    🎣 Joc de Pescuit 3D<br />
+    Apasă <strong>Space</strong> pentru a arunca undița!
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 5, 10);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    dirLight.position.set(10, 10, 10);
+    scene.add(dirLight);
+
+    const waterGeometry = new THREE.PlaneGeometry(50, 50);
+    const waterMaterial = new THREE.MeshPhongMaterial({ color: 0x1e90ff, side: THREE.DoubleSide });
+    const water = new THREE.Mesh(waterGeometry, waterMaterial);
+    water.rotation.x = -Math.PI / 2;
+    scene.add(water);
+
+    // Fishing line
+    const rodMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+    const rodPoints = [new THREE.Vector3(0, 5, 0), new THREE.Vector3(0, 0, 0)];
+    const rodGeometry = new THREE.BufferGeometry().setFromPoints(rodPoints);
+    const fishingLine = new THREE.Line(rodGeometry, rodMaterial);
+    scene.add(fishingLine);
+
+    // Fish
+    const fishGeometry = new THREE.ConeGeometry(0.4, 1, 16);
+    const fishMaterial = new THREE.MeshPhongMaterial({ color: 0xffa500 });
+    const fish = new THREE.Mesh(fishGeometry, fishMaterial);
+    fish.position.set(Math.random() * 10 - 5, 0.3, Math.random() * 10 - 5);
+    fish.rotation.x = Math.PI / 2;
+    scene.add(fish);
+
+    function animateFish() {
+      fish.position.x += (Math.random() - 0.5) * 0.05;
+      fish.position.z += (Math.random() - 0.5) * 0.05;
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      animateFish();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        fish.position.set(Math.random() * 10 - 5, 0.3, Math.random() * 10 - 5);
+        alert("Ai prins un pește! 🎉");
+      }
+    });
+  </script>
+</body>
+</html>
